@@ -1,0 +1,47 @@
+import torch
+import torch.nn as nn
+import torch.nn.parallel
+import torch.optim as optim
+import torchvision.transforms as transforms
+import torch.nn.functional as F
+from torch.autograd import Variable
+
+import random
+import numpy as np
+import matplotlib.pyplot as plt
+
+random.seed(42)
+
+mytransform1 = transforms.Compose(
+    [transforms.RandomCrop((101,101)),
+     transforms.ToTensor(),
+     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+def mynorm2(x):
+    m1 = torch.min(x)
+    m2 = torch.max(x)
+    return (x-m1)/(m2-m1)
+
+mytransform2 = transforms.Compose(
+    [transforms.RandomCrop((101,101)),
+     transforms.ToTensor(),
+     transforms.Lambda( lambda x : mynorm2(x))])
+
+trainset = dsets.ImageFolder(root='../sample_dataset/train/',transform=mytransform2)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=4, shuffle=True, num_workers=2)
+
+testset = dsets.ImageFolder(root='../sample_dataset/test/',transform=mytransform2)
+testloader = torch.utils.data.DataLoader(testset, batch_size=4, shuffle=True, num_workers=2)
+
+# functions to show an image
+def imshow(img):
+    #img = img / 2 + 0.5 
+    npimg = img.numpy()
+    plt.imshow(np.transpose(npimg, (1, 2, 0)))
+    
+def imshow2(img):
+    m1 = torch.min(img)
+    m2 = torch.max(img)
+    img = (img-m1)/(m2-m1)
+    npimg = img.numpy()
+    plt.imshow(np.transpose(npimg, (1, 2, 0)))
