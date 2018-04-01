@@ -6,9 +6,15 @@ import torchvision.transforms as transforms
 import torch.nn.functional as F
 from torch.autograd import Variable
 
+from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms, utils
+import torchvision.datasets as dsets
+import torchvision
+
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 random.seed(42)
 
@@ -16,8 +22,6 @@ mytransform1 = transforms.Compose(
     [transforms.RandomCrop((101,101)),
      transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
-
 
 # functions to show an image
 def imshow(img):

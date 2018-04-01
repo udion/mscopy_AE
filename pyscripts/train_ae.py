@@ -14,20 +14,8 @@ D1 = Decoder(n_res_blocks=10)
 A = AE(E1, D1)
 A = A.cuda()
 
-testX, _ = next(testiter)
-testiter = iter(testloader)
-def eval_model(model):
-    X = testX
-    print('input looks like ...')
-    plt.figure()
-    imshow(torchvision.utils.make_grid(X))
-    
-    X = Variable(X).cuda()
-    Y = model(X)
-    print('output looks like ...')
-    plt.figure()
-    imshow2(torchvision.utils.make_grid(Y.data.cpu()))
-
+vgg19_exc = VGG19_extractor(torchvision.models.vgg19(pretrained=True))
+vgg19_exc = vgg19_exc.cuda()
 
 def train_ae(model, modelName, batchsz):
     ########## logging stuff
@@ -36,9 +24,9 @@ def train_ae(model, modelName, batchsz):
     ########################
 
     def mynorm2(x):
-    m1 = torch.min(x)
-    m2 = torch.max(x)
-    return (x-m1)/(m2-m1)
+        m1 = torch.min(x)
+        m2 = torch.max(x)
+        return (x-m1)/(m2-m1)
 
     mytransform2 = transforms.Compose(
         [transforms.RandomCrop((41,41)),
@@ -46,10 +34,24 @@ def train_ae(model, modelName, batchsz):
         transforms.Lambda( lambda x : mynorm2(x))])
 
     trainset = dsets.ImageFolder(root='../sample_dataset/train/',transform=mytransform2)
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=4, shuffle=True, num_workers=2)
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=batchsz, shuffle=True, num_workers=2)
 
     testset = dsets.ImageFolder(root='../sample_dataset/test/',transform=mytransform2)
-    testloader = torch.utils.data.DataLoader(testset, batch_size=4, shuffle=True, num_workers=2)
+    testloader = torch.utils.data.DataLoader(testset, batch_size=batchsz, shuffle=True, num_workers=2)
+
+    testiter = iter(testloader)
+    testX, _ = next(testiter)
+    def eval_model(model):
+        X = testX
+        print('input looks like ...')
+        plt.figure()
+        imshow(torchvision.utils.make_grid(X))
+        
+        X = Variable(X).cuda()
+        Y = model(X)
+        print('output looks like ...')
+        plt.figure()
+        imshow2(torchvision.utils.make_grid(Y.data.cpu()))
 
     nepoch = 500
     Criterion2 = nn.MSELoss()
@@ -101,7 +103,7 @@ def train_ae(model, modelName, batchsz):
         mean_total_loss /= tot_count
         log_value('L2_term', mean_L2_term, eph)
         log_value('vl3_term', mean_vl3_term, eph)
-        log_value('total_loss', mean_total_term, eph)
+        log_value('total_loss', mean_total_loss, eph)
 
         print('epoch:{}, mean_L2term:{}, mean_vl3: {}, mean_reconTerm: {}'.format(eph, mean_L2_term, mean_vl3_term, mean_total_loss))
         save_model(model, modelName)
