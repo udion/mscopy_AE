@@ -17,21 +17,7 @@ mytransform1 = transforms.Compose(
      transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-def mynorm2(x):
-    m1 = torch.min(x)
-    m2 = torch.max(x)
-    return (x-m1)/(m2-m1)
 
-mytransform2 = transforms.Compose(
-    [transforms.RandomCrop((101,101)),
-     transforms.ToTensor(),
-     transforms.Lambda( lambda x : mynorm2(x))])
-
-trainset = dsets.ImageFolder(root='../sample_dataset/train/',transform=mytransform2)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=4, shuffle=True, num_workers=2)
-
-testset = dsets.ImageFolder(root='../sample_dataset/test/',transform=mytransform2)
-testloader = torch.utils.data.DataLoader(testset, batch_size=4, shuffle=True, num_workers=2)
 
 # functions to show an image
 def imshow(img):
