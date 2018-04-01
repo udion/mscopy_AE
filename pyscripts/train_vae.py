@@ -21,7 +21,7 @@ def eval_model(model):
     plt.figure()
     imshow2(torchvision.utils.make_grid(Y.data.cpu()))
 
-def train(model, rec_interval=2, disp_interval=20, eval_interval=1):
+def train_vae(model, rec_interval=2, disp_interval=20, eval_interval=1):
     nepoch = 100
     Criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=1e-4)
@@ -44,8 +44,34 @@ def train(model, rec_interval=2, disp_interval=20, eval_interval=1):
             if i%disp_interval == 0:
                 print('epoch : {}, iter : {}, KLterm : {}, reconTerm : {}, totalLoss : {}'.format(eph, i, KLTerm.data[0], reconTerm.data[0], loss.data[0]))
         
-        if eph%eval_interval == 0:
-            print('after epoch {} ...'.format(eph))
-            eval_model(model)
+        # if eph%eval_interval == 0:
+        #     print('after epoch {} ...'.format(eph))
+        #     eval_model(model)
+    return loss_track
+
+def train_ae(model, rec_interval=2, disp_interval=20, eval_interval=1):
+    nepoch = 500
+    Criterion2 = nn.MSELoss()
+    Criterion1 = nn.L1Loss()
+    optimizer = optim.Adam(model.parameters(), lr=1e-5)
+    loss_track = []
+    for eph in range(nepoch):
+        dataloader = iter(trainloader)
+        print('starting epoch {} ...'.format(eph))
+        for i, (X, _) in enumerate(dataloader):
+            X = Variable(X).cuda()
+            optimizer.zero_grad()
+            reconX = model(X)
+            l2 = Criterion2(reconX, X)
+            l1 = Criterion1(reconX, X)
+            reconTerm = l2+l1
+            loss =reconTerm
+            loss.backward()
+            optimizer.step()
+            
+            if i%rec_interval == 0:
+                loss_track.append(loss.data[0])
+            if i%disp_interval == 0:
+                print('epoch : {}, iter : {}, L2term : {}, L1term : {}, reconTerm : {}, totalLoss : {}'.format(eph, i, l2.data[0], l1.data[0], reconTerm.data[0], loss.data[0]))
     return loss_track
 

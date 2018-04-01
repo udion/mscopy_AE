@@ -38,6 +38,15 @@ class resTransposeBlock(nn.Module):
         y = F.relu(self.bn1(self.conv1(x)))
         return self.bn2(self.conv2(y)) + x
 
+class VGG19_extractor(nn.Module):
+    def __init__(self, cnn):
+        super(VGG19_extractor, self).__init__()
+        self.features1 = nn.Sequential(*list(cnn.features.children())[:3])
+        self.features2 = nn.Sequential(*list(cnn.features.children())[:5])
+        self.features3 = nn.Sequential(*list(cnn.features.children())[:12])
+    def forward(self, x):
+        return self.features1(x), self.features2(x), self.features3(x)
+
 class Encoder(nn.Module):
     def __init__(self, n_res_blocks=5):
         super(Encoder, self).__init__()
@@ -125,3 +134,12 @@ class VAE(nn.Module):
         z = self._din_layer(z)
         z = z.view(self.batchsz, 1, 26, 26)
         return self.D(z)
+
+class AE(nn.Module):
+    def __init__(self, encoder, decoder):
+        super(AE, self).__init__()
+        self.E = encoder
+        self.D = decoder
+    def forward(self, x):
+        h_enc = self.E(x)
+        return self.D(h_enc)

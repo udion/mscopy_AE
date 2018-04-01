@@ -45,3 +45,11 @@ def imshow2(img):
     img = (img-m1)/(m2-m1)
     npimg = img.numpy()
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
+
+def save_model(model, model_name):
+    try:
+        os.makedirs('../saved_models')
+    except OSError:
+        pass
+    torch.save(model.state_dict(), '../saved_models/'+model_name)
+    print('model saved at '+'../saved_models/'+model_name)
