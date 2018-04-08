@@ -8,36 +8,55 @@ try:
 except OSError:
     pass
 
+vgg19_exc = VGG19_extractor(torchvision.models.vgg19(pretrained=True))
+vgg19_exc = vgg19_exc.cuda()
 
 E1 = Encoder(n_res_blocks=10)
 D1 = Decoder(n_res_blocks=10)
 A = AE(E1, D1)
 A = A.cuda()
 
-vgg19_exc = VGG19_extractor(torchvision.models.vgg19(pretrained=True))
-vgg19_exc = vgg19_exc.cuda()
-
 def train_ae(model, modelName, batchsz):
     ########## logging stuff
     configure('../train_logs/'+modelName+'_bsz{}'.format(batchsz), flush_secs=5)
     print('I configured .. ')
     ########################
-
     def mynorm2(x):
         m1 = torch.min(x)
         m2 = torch.max(x)
-        return (x-m1)/(m2-m1)
+        if m2-m1 < 1e-6:
+            return x
+        else:
+            return (x-m1)/(m2-m1)
 
     mytransform2 = transforms.Compose(
-        [transforms.RandomCrop((41,41)),
+        [transforms.RandomCrop((121,121)),
+    #      transforms.Lambda( lambda x : Image.fromarray(gaussian_filter(x, sigma=(10,10,0)) )),
+    #      transforms.Resize((41,41)),
         transforms.ToTensor(),
-        transforms.Lambda( lambda x : mynorm2(x))])
+        transforms.Lambda( lambda x : mynorm2(x) )])
 
     trainset = dsets.ImageFolder(root='../sample_dataset/train/',transform=mytransform2)
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batchsz, shuffle=True, num_workers=2)
 
     testset = dsets.ImageFolder(root='../sample_dataset/test/',transform=mytransform2)
     testloader = torch.utils.data.DataLoader(testset, batch_size=batchsz, shuffle=True, num_workers=2)
+
+    # def mynorm2(x):
+    #     m1 = torch.min(x)
+    #     m2 = torch.max(x)
+    #     return (x-m1)/(m2-m1)
+
+    # mytransform2 = transforms.Compose(
+    #     [transforms.RandomCrop((41,41)),
+    #     transforms.ToTensor(),
+    #     transforms.Lambda( lambda x : mynorm2(x))])
+
+    # trainset = dsets.ImageFolder(root='../sample_dataset/train/',transform=mytransform2)
+    # trainloader = torch.utils.data.DataLoader(trainset, batch_size=batchsz, shuffle=True, num_workers=2)
+
+    # testset = dsets.ImageFolder(root='../sample_dataset/test/',transform=mytransform2)
+    # testloader = torch.utils.data.DataLoader(testset, batch_size=batchsz, shuffle=True, num_workers=2)
 
     testiter = iter(testloader)
     testX, _ = next(testiter)
@@ -106,6 +125,6 @@ def train_ae(model, modelName, batchsz):
         log_value('total_loss', mean_total_loss, eph)
 
         print('epoch:{}, mean_L2term:{}, mean_vl3: {}, mean_reconTerm: {}'.format(eph, mean_L2_term, mean_vl3_term, mean_total_loss))
-        save_model(model, modelName)
+        save_model(model, modelName+'.pth')
     return loss_track
 
