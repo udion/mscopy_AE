@@ -26,6 +26,7 @@ This repo serves as the code base for an **auto-encoder network** which I can us
 ## Something about the architecture
 The Encoder and Decoder are like mirror images of each other. Encoder consists of Convolutional layers separated by the residual blocks, Decoder consists of the similar pattern in reverse order with Convolutinal Transpose layer instead of Convoutional ( it is also known by Deconvolution, which is sad misnomer )
 The guiding principle for me in the design of the autoencoder was one that it should be able to produce encodings which lie in much lower dimensions compred to original image while still capable of capturing fine details so that the taking MSE loss between these encodings actually help the SRGAN network to learn something meaniningfull and help it to generate super resolution version with fine details.
+![sample_slides](./readme_images/AE.png)
 
 ## Results so far
 This is still under-development as I continue exploring different concepts and tweaks to get better results, at this stage the results of encoder and decoder are as follows :
