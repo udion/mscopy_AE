@@ -18,7 +18,8 @@ Super resolution is quite relevant in the field of medical imaging and a hot top
 * Not that simple. The original SRGAN uses uses the features extracted from ***pre-trained*** VGG network, pre-trained on ***Natural Images*** (ImageNet to be precise). And guess what? ImageNet doesn't have microscopy images, or CTs or MRIs etc. We can't expect it to work for medical images out of the box.
 
 ## Why does this repo exist?
-I decided to test the idea on some medical images (read [CAMELYON 16](https://camelyon16.grand-challenge.org/)). This consists of ***hematoxylin and eosin (H&E) stained whole-slide images*** the original purpose of the dataset was to train models for automatic detection of medical conditions. The dataset consists of high resolution images ( yay! exactly what we need for training a network performing super resolution ).
+I decided to test the idea on some medical images (read [CAMELYON 16](https://camelyon16.grand-challenge.org/)). This consists of ***hematoxylin and eosin (H&E) stained whole-slide images*** the original purpose of the dataset was to train models for automatic detection of medical conditions. The dataset consists of high resolution images ( yay! exactly what we need for training a network performing super resolution ). Some sample cropped patches from the dataset looks like
+![sample_slides](./readme_images/sample_slides.png)
 
 This repo serves as the code base for an **auto-encoder network** which I can use in my super resolution network to perform super resolution for this dataset. Remember the VGG loss term mentioned above, this is to replace that loss term.
 
@@ -28,6 +29,27 @@ The guiding principle for me in the design of the autoencoder was one that it sh
 
 ## Results so far
 This is still under-development as I continue exploring different concepts and tweaks to get better results, at this stage the results of encoder and decoder are as follows :
+
+The input batch looks like (each image is `3X181X181` dimensional)
+
+![input_batch](./readme_images/ae_in.png)
+
+I forced the encodings to be one channel output so that I can visualise it as image
+The encodings look like (each encoding is `1X46X46` dimensional)
+
+![en_batch](./readme_images/ae_en.png)
+
+For better visualisation, the *linear contrast* and *histogram eqalisation* leads to
+
+![en_batch](./readme_images/ae_en_lin.png)
+![en_batch](./readme_images/ae_en_he.png)
+
+Intrestingly the features do resemble the input images.
+
+The output batch looks like (each image is `3X181X181` dimensional)
+
+![input_batch](./readme_images/ae_out.png)
+
 
 ## What's going on right now?
 This module is to be integrated with [my implementation of SRGAN and modified SRGAN like networks](https://github.com/udion/srgan_pilot) module to look at the final results of the super resolution. Stay tuned!
