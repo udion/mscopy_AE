@@ -7,6 +7,8 @@ Super resolution refers to the technique where we try to get the high resolution
 
 The idea of the above proposed model is to use adversarial loss and training instead of some standard loss functions used before such as MSE as such loss functions would lead to optimal images which sure have low MSE but visually blurry (not in the natural manifold of images). The adversarial training nudges the *Generator* towards natural manifold of images, hence the output is visually more appealing.
 
+![srgan_manifold](./readme_images/srgan_manifold.png)
+
 One of the main features of the above proposed method is it's *loss-function* in addition of minimizing the MSE between the pixel values of the original High resolution image and the "super-resoluted" image (the standard method), they also take into account the MSE between some feature space (like output of VGG network from some intermediate layer), and also an additional term representing the *GAN* loss function (**note that the paper uses the standard flavor of GAN not the Wasserstein-GAN**)
 
 ## Motivation
