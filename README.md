@@ -19,3 +19,13 @@ Super resolution is quite relevant in the field of medical imaging and a hot top
 I decided to test the idea on some medical images (read [CAMELYON 16](https://camelyon16.grand-challenge.org/)). This consists of ***hematoxylin and eosin (H&E) stained whole-slide images*** the original purpose of the dataset was to train models for automatic detection of medical conditions. The dataset consists of high resolution images ( yay! exactly what we need for training a network performing super resolution ).
 
 This repo serves as the code base for an **auto-encoder network** which I can use in my super resolution network to perform super resolution for this dataset. Remember the VGG loss term mentioned above, this is to replace that loss term.
+
+## Something about the architecture
+The Encoder and Decoder are like mirror images of each other. Encoder consists of Convolutional layers separated by the residual blocks, Decoder consists of the similar pattern in reverse order with Convolutinal Transpose layer instead of Convoutional ( it is also known by Deconvolution, which is sad misnomer )
+The guiding principle for me in the design of the autoencoder was one that it should be able to produce encodings which lie in much lower dimensions compred to original image while still capable of capturing fine details so that the taking MSE loss between these encodings actually help the SRGAN network to learn something meaniningfull and help it to generate super resolution version with fine details.
+
+## Results so far
+This is still under-development as I continue exploring different concepts and tweaks to get better results, at this stage the results of encoder and decoder are as follows :
+
+## What's going on right now?
+This module is to be integrated with [my implementation of SRGAN and modified SRGAN like networks](https://github.com/udion/srgan_pilot) module to look at the final results of the super resolution. Stay tuned!
